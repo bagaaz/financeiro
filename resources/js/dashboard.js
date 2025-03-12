@@ -78,30 +78,25 @@ document.addEventListener("DOMContentLoaded", function() {
     const balancoPeriodo = new Chart(ctxBalancoPeriodo, {
         type: 'bar',
         data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul'],
-            datasets: [{
-                label: 'Gastos',
-                data: [65, 59, 80, 81, 56, 55, 40],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(255, 159, 64, 0.2)',
-                    'rgba(255, 205, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(201, 203, 207, 0.2)'
-                ],
-                borderColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(255, 159, 64)',
-                    'rgb(255, 205, 86)',
-                    'rgb(75, 192, 192)',
-                    'rgb(54, 162, 235)',
-                    'rgb(153, 102, 255)',
-                    'rgb(201, 203, 207)'
-                ],
-                borderWidth: 1
-            }]
+            labels: [],
+            datasets: [
+                {
+                    label: 'Entradas',
+                    data: [],
+                    borderColor: 'rgb(32, 227, 74)',
+                    backgroundColor: 'rgba(32, 227, 74, 0.2)',
+                    fill: true,
+                    tension: 0.1,
+                },
+                {
+                    label: 'Saídas',
+                    data: [],
+                    borderColor: 'rgb(227, 74, 32)',
+                    backgroundColor: 'rgba(227, 74, 32, 0.2)',
+                    fill: true,
+                    tension: 0.1,
+                }
+            ]
         },
         options: {
             responsive: true,
@@ -113,12 +108,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     callbacks: {
                         label: function(context) {
                             let label = context.dataset.label || '';
-                            // Verifica se o valor está encapsulado em um objeto (por exemplo, para gráficos de linha)
+                            // Extrai o valor (tratando possíveis objetos)
                             let value = typeof context.parsed === 'object' ? context.parsed.y : context.parsed;
                             if (value !== undefined) {
-                                // Converte para número, se necessário
                                 let numericValue = parseFloat(value);
-                                // Formata o valor absoluto e adiciona o sinal de negativo manualmente se necessário
                                 let formatted = new Intl.NumberFormat('pt-BR', {
                                     style: 'currency',
                                     currency: 'BRL'

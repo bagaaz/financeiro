@@ -84,9 +84,10 @@ class TransactionsController extends Controller
         if ($transaction) {
             $installments = (int) $dados['installments'];
             if ($installments > 0) {
-                $transactionDate = Carbon::parse($dados['transaction_date'])->startOfMonth();
+                $transactionDate = Carbon::parse($dados['transaction_date']);
 
-                $installmentAmount = Helper::realToFloat($dados['total_amount']) / $installments;
+
+                $installmentAmount = $dados['total_amount'] / $installments;
 
                 for ($i = 0; $i < $installments; $i++) {
                     $installmentDate = $transactionDate->copy()->addMonths($i);
