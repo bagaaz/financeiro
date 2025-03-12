@@ -21,21 +21,23 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $categories = [
-            'Alimentação',
-            'Educação',
-            'Lazer',
-            'Moradia',
-            'Outros',
-            'Saúde',
-            'Serviços',
-            'Taxas',
-            'Transporte',
-            'Vestuários'
+            ['name' => 'Alimentação', 'color' => '#FF5733'],
+            ['name' => 'Beleza', 'color' => '#33FF57'],
+            ['name' => 'Educação', 'color' => '#3357FF'],
+            ['name' => 'Lazer', 'color' => '#FF33A1'],
+            ['name' => 'Moradia', 'color' => '#FF8C33'],
+            ['name' => 'Outros', 'color' => '#33FFF5'],
+            ['name' => 'Saúde', 'color' => '#F533FF'],
+            ['name' => 'Serviços', 'color' => '#FFC733'],
+            ['name' => 'Taxas', 'color' => '#33FF8C'],
+            ['name' => 'Transporte', 'color' => '#8C33FF'],
+            ['name' => 'Vestuários', 'color' => '#FF3333']
         ];
 
         foreach ($categories as $category) {
             TransactionCategory::create([
-                'name' => $category,
+                'name' => $category['name'],
+                'color' => $category['color'],
             ]);
         }
 

@@ -26,7 +26,6 @@
         @include('partials.footer')
     </main>
 
-
     {{--  JavaScripts  --}}
     @vite('resources/js/app.js')
     @stack('scripts')

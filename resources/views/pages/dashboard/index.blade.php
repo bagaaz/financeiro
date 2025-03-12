@@ -2,44 +2,10 @@
 
 @section('content')
     <!-- Filtro e Gráfico -->
-    <div x-data="{ open: false }" class="w-full relative inline-block text-left">
-        <div class="text-end text-gray-600">
-            <button @click="open = !open" type="button" id="filter-menu" aria-expanded="open" aria-haspopup="true">
-                @svg('solar-filter-bold', ['class' => 'h-6 w-6'])
-            </button>
-        </div>
-
-        {{-- Filtro Menu --}}
-        <div x-show="open" class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white ring-1 shadow-lg ring-black/5 focus:outline-hidden"
-             role="menu" aria-orientation="vertical" aria-labelledby="filter-menu" tabindex="-1">
-            <div class="p-4">
-                <div>
-                    <label for="month" class="block text-sm font-medium text-gray-500">{{ __('messages.month') }}</label>
-                    <select id="month" name="month" class="mt-1 block w-full">
-                        <option value="01">{{ __('messages.jan') }}</option>
-                        <option value="02">{{ __('messages.fev') }}</option>
-                        <option value="03">{{ __('messages.mar') }}</option>
-                        <option value="04">{{ __('messages.apr') }}</option>
-                        <option value="05">{{ __('messages.may') }}</option>
-                        <option value="06">{{ __('messages.jun') }}</option>
-                        <option value="07">{{ __('messages.jul') }}</option>
-                        <option value="08">{{ __('messages.aug') }}</option>
-                        <option value="09">{{ __('messages.sep') }}</option>
-                        <option value="10">{{ __('messages.oct') }}</option>
-                        <option value="11">{{ __('messages.nov') }}</option>
-                        <option value="12">{{ __('messages.dec') }}</option>
-                    </select>
-                </div>
-
-                <div class="mt-4">
-                    <label for="year" class="block text-sm font-medium text-gray-500">{{ __('messages.year') }}</label>
-                    <select id="year" name="year" class="mt-1 block w-full">
-                        @foreach($years as $year)
-                            <option value="{{$year}}">{{$year}}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
+    <div class="w-full flex justify-start text-left">
+        <div class="mt-4">
+            <label for="daterange" class="block text-sm font-medium text-gray-500">Selecione o Período</label>
+            <input type="text" name="daterange" id="daterange" class="mt-1" />
         </div>
     </div>
 
@@ -48,19 +14,19 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="bg-white p-4 rounded shadow">
                 <div class="text-gray-500 text-sm">Valor Pago</div>
-                <div class="text-xl font-bold">{{ $valorPago }}</div>
+                <div class="text-xl font-bold" data-paid-value>R$ 00,00</div>
             </div>
             <div class="bg-white p-4 rounded shadow">
                 <div class="text-gray-500 text-sm">Valor a Pagar</div>
-                <div class="text-xl font-bold">{{ $valorAPagar }}</div>
+                <div class="text-xl font-bold" data-pending-value>R$ 00,00</div>
             </div>
             <div class="bg-white p-4 rounded shadow">
                 <div class="text-gray-500 text-sm">Total Gasto</div>
-                <div class="text-xl font-bold">{{ $totalGastos }}</div>
+                <div class="text-xl font-bold" data-total-expanse>R$ 00,00</div>
             </div>
             <div class="bg-white p-4 rounded shadow">
                 <div class="text-gray-500 text-sm">Total Entradas</div>
-                <div class="text-xl font-bold">{{ $totalEntradas }}</div>
+                <div class="text-xl font-bold" data-total-income>R$ 00,00</div>
             </div>
         </div>
     </div>
@@ -91,3 +57,50 @@
         </div>
     </div>
 @endsection
+
+@push('styles')
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+@endpush
+
+@push('scripts')
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <script>
+        const paidValue = document.querySelector('[data-paid-value]');
+        const pendingValue = document.querySelector('[data-pending-value]');
+        const totalExpanse = document.querySelector('[data-total-expanse]');
+        const totalIncome = document.querySelector('[data-total-income]');
+
+        $(function() {
+            $('#daterange').daterangepicker({
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                startDate: moment().startOf('month'),
+                endDate: moment().endOf('month')
+            }, function(start, end, label) {
+                $.ajax({
+                    url: '{{ route('dashboard.data') }}',
+                    type: 'GET',
+                    data: {
+                        start: start.format('YYYY-MM-DD'),
+                        end: end.format('YYYY-MM-DD')
+                    },
+                    success: function(data) {
+                        console.log('Dados retornados:', data);
+
+                        paidValue.innerHTML = data.paidValue;
+                        pendingValue.innerHTML = data.pendingValue;
+                        totalExpanse.innerHTML = data.totalExpanse;
+                        totalIncome.innerHTML = data.totalIncome;
+                    },
+                    error: function(error) {
+                        console.error("Erro na requisição:", error);
+                    }
+                })
+            });
+        });
+    </script>
+@endpush

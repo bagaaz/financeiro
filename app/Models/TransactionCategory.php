@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @property int $id
  * @property string $name
+ * @property string $color
  * @property TransactionCategory $parent_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at

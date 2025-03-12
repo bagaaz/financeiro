@@ -17,6 +17,7 @@ Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
 
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/data', [DashboardController::class, 'data'])->name('dashboard.data');
 
     Route::resource('transactions', TransactionsController::class)->names('transactions');
     Route::get('transactions/status/{id}', [TransactionsController::class, 'status'])->name('transactions.status');
