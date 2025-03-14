@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PaymentType;
 use App\Helpers\Alert;
 use App\Helpers\Helper;
 use App\Models\Transaction;
@@ -82,11 +83,22 @@ class TransactionsController extends Controller
         ]);
 
         if ($transaction) {
-            $installments = (int) $dados['installments'];
-            if ($installments > 0) {
-                $transactionDate = Carbon::parse($dados['transaction_date']);
+            $transactionDate = Carbon::parse($transaction->transaction_date);
+            $installmentAmount = $dados['total_amount'];
 
+            if ($dados['payment_type'] == PaymentType::Unique->value) {
 
+                TransactionInstallment::create([
+                    'transaction_id'   => $transaction->id,
+                    'installment_number' => 1,
+                    'installment_amount' => $installmentAmount,
+                    'transaction_date' => $transactionDate,
+                    'status'           => $dados['status'],
+                ]);
+            }
+
+            if ($dados['payment_type'] == PaymentType::Installment->value) {
+                $installments = (int) $dados['installments'];
                 $installmentAmount = $dados['total_amount'] / $installments;
 
                 for ($i = 0; $i < $installments; $i++) {
@@ -100,6 +112,25 @@ class TransactionsController extends Controller
                     ]);
                 }
             }
+
+            if ($dados['payment_type'] == PaymentType::Recurring->value) {
+                $transactionDate = Carbon::parse($transaction->transaction_date);
+                $startMonth = $transactionDate->month;
+                $remainingMonths = 12 - $startMonth + 1;
+
+                for ($i = 0; $i < $remainingMonths; $i++) {
+                    $installmentDate = $transactionDate->copy()->addMonths($i);
+                    TransactionInstallment::create([
+                        'transaction_id'     => $transaction->id,
+                        'installment_number' => $i + 1,
+                        'installment_amount' => $dados['total_amount'],
+                        'transaction_date'   => $installmentDate,
+                        'status'             => $dados['status'],
+                    ]);
+                }
+            }
+
+
 
             Alert::success(__('messages.all_right_message'));
             return redirect()->back();
